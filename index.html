@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LCL Banque - Banque en ligne</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="text/babel" src="./transfer.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="https://www.pagesjaunes.fr/media/agc/f9/6e/30/00/00/3f/00/7b/57/67/666af96e3000003f007b5767/666af972300000ea1c7b5776.jpg">
+  <link rel="apple-touch-icon" href="https://www.pagesjaunes.fr/media/agc/f9/6e/30/00/00/3f/00/7b/57/67/666af96e3000003f007b5767/666af972300000ea1c7b5776.jpg">
+  <link rel="shortcut icon" href="https://www.pagesjaunes.fr/media/agc/f9/6e/30/00/00/3f/00/7b/57/67/666af96e3000003f007b5767/666af972300000ea1c7b5776.jpg">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); transition: box-shadow 0.3s; border: 1px solid #e5e7eb; }
+    .card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.10); }
+    .btn-primary { background: #FFD300; color: #1f2937; padding: 12px 24px; border-radius: 12px; font-weight: 700; transition: all 0.2s; cursor: pointer; }
+    .btn-primary:hover { background: #e6c000; }
+    .btn-secondary { background: #f3f4f6; color: #374151; padding: 12px 24px; border-radius: 12px; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .btn-secondary:hover { background: #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const Home = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>;
+    const CreditCard = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>;
+    const TrendingUp = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>;
+    const Wallet = () => <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>;
+    const ArrowUpRight = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 17L17 7M7 7h10v10"/></svg>;
+    const ArrowDownLeft = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 7L7 17M17 17H7V7"/></svg>;
+    const Menu = () => <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/></svg>;
+    const Bell = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.057-.59 1.432L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>;
+    const Search = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>;
+    const LogOut = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>;
+    const Plus = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>;
+
+    function Login({ onLogin }) {
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        setTimeout(() => {
+          if (email === 'charles@example.com' && password === 'password') {
+            onLogin();
+          } else {
+            setError('Email ou mot de passe incorrect');
+          }
+          setLoading(false);
+        }, 1000);
+      };
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-[#272E80] to-[#060a36] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-200">
+            <div className="text-center mb-8">
+              <img src="https://www.pagesjaunes.fr/media/agc/f9/6e/30/00/00/3f/00/7b/57/67/666af96e3000003f007b5767/666af972300000ea1c7b5776.jpg" alt="LCL Banque" className="h-16 mx-auto mb-2" />
+              <p className="text-gray-500">Banque en ligne sécurisée</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">{error}</div>}
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="charles@example.com" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD300] focus:border-transparent outline-none" required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Mot de passe</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD300] focus:border-transparent outline-none" required />
+              </div>
+
+              <button type="submit" disabled={loading} className="w-full bg-[#FFD300] text-gray-900 py-3 rounded-xl font-bold hover:bg-[#e6c000] transition-colors disabled:opacity-50">
+                {loading ? 'Connexion...' : 'Se connecter'}
+              </button>
+            </form>
+
+            <div className="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-100">
+              <p className="text-xs text-yellow-800 font-semibold mb-2">ℹ️ Info importante :</p>
+              <p className="text-xs text-yellow-700">Pour la bonne exécution de vos contrats, et en cas de réclamations/contestations, votre Conseiller est joignable sur sa ligne directe (appel non surtaxé).</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Sidebar({ isOpen, setIsOpen, activePage, setActivePage }) {
+      const menuItems = [
+        { icon: Home, label: 'Accueil', id: 'home' },
+        { icon: CreditCard, label: 'Cartes', id: 'cards' },
+        { icon: TrendingUp, label: 'Transactions', id: 'transactions' },
+        { icon: TrendingUp, label: 'Statistiques', id: 'stats' },
+      ];
+
+      return (
+        <>
+          {isOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setIsOpen(false)} />}
+          <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 lg:transform-none flex flex-col border-r border-slate-200 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+            <div className="p-6 border-b border-slate-200">
+              <img src="https://www.pagesjaunes.fr/media/agc/f9/6e/30/00/00/3f/00/7b/57/67/666af96e3000003f007b5767/666af972300000ea1c7b5776.jpg" alt="LCL Banque" className="h-10 mb-2" />
+              <p className="text-sm text-gray-500 mt-1">Banque en ligne</p>
+            </div>
+            <nav className="flex-1 p-4 space-y-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => { setActivePage(item.id); setIsOpen(false); }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl w-full transition-all ${activePage === item.id ? 'bg-yellow-50 text-[#272E80] font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                  >
+                    <Icon />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="p-4 border-t border-slate-200">
+              <button onClick={() => setActivePage('login')} className="flex items-center gap-3 px-4 py-3 w-full text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all">
+                <LogOut />
+                <span>Déconnexion</span>
+              </button>
+            </div>
+          </aside>
+        </>
+      );
+    }
+
+    function Header({ onMenuClick }) {
+      return (
+        <header className="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
+          <div className="px-4 py-4 flex items-center justify-between">
+            <button onClick={onMenuClick} className="lg:hidden p-2 hover:bg-gray-100 rounded-xl"><Menu /></button>
+            <div className="hidden md:flex flex-1 max-w-md">
+              <div className="relative w-full">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Search /></div>
+                <input type="text" placeholder="Rechercher..." className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD300] outline-none pl-10" />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="relative p-2 hover:bg-gray-100 rounded-xl">
+                <Bell />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#272E80] to-[#060a36] rounded-full flex items-center justify-center text-white font-semibold">
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <div className="hidden md:block">
+                  <p className="text-sm font-semibold">Christine Kadrell</p>
+                  <p className="text-xs text-gray-500">Compte premium</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    function Dashboard() {
+      const accounts = [
+        { id: 1, name: 'Compte Courant', balance: 125430.50, color: 'from-[#272E80] to-[#4C8CC7]', icon: Wallet },
+        { id: 2, name: 'Épargne', balance: 85000.00, color: 'from-black to-slate-700', icon: TrendingUp },
+        { id: 3, name: 'Carte Premium', balance: 15230.75, color: 'from-[#FFD300] to-[#e6c000]', icon: CreditCard },
+      ];
+
+      const stats = [
+        { label: 'Revenus du mois', value: 45000, change: '+12.5%', isPositive: true, icon: ArrowDownLeft, iconColor: 'text-green-500', bgColor: 'bg-green-100' },
+        { label: 'Dépenses du mois', value: 28500, change: '-5.3%', isPositive: true, icon: ArrowUpRight, iconColor: 'text-red-500', bgColor: 'bg-red-100' },
+        { label: 'Épargne', value: 16500, change: '+18.2%', isPositive: true, icon: TrendingUp, iconColor: 'text-[#272E80]', bgColor: 'bg-blue-100' },
+      ];
+
+      const transactions = [
+        { id: 1, name: 'Amazon', amount: -125.99, type: 'dépense', date: "Aujourd'hui", icon: '🛒' },
+        { id: 2, name: 'Salaire', amount: 45000, type: 'revenu', date: "Hier", icon: '💰' },
+        { id: 3, name: 'Netflix', amount: -12.99, type: 'dépense', date: "2 déc", icon: '🎬' },
+        { id: 4, name: 'Resto', amount: -85.50, type: 'dépense', date: "1 déc", icon: '🍽️' },
+        { id: 5, name: 'Bonus', amount: 5000, type: 'revenu', date: "1 déc", icon: '🎁' },
+        { id: 6, name: 'Uber', amount: -24.50, type: 'dépense', date: "1 déc", icon: '🚕' },
+      ];
+
+      const formatCurrency = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+
+      return (
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
+              <p className="text-gray-500 mt-1">Bienvenue, Christine Kadrell. Voici votre vue d'ensemble.</p>
+            </div>
+            <button className="btn-primary w-fit">
+              <a href="virement.html">+ Nouveau virement</a>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {accounts.map((account) => {
+              const Icon = account.icon;
+              return (
+                <div key={account.id} className={`card bg-gradient-to-br ${account.color} text-white relative overflow-hidden`}>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-3 bg-white/20 rounded-xl"><Icon /></div>
+                      <span className="font-semibold">{account.name}</span>
+                    </div>
+                    <p className="text-3xl font-bold mb-2">{formatCurrency(account.balance)}</p>
+                    <p className="text-sm text-white/80">*** **** **** {account.id}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={index} className="card">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`p-3 ${stat.bgColor} ${stat.iconColor} rounded-xl`}><Icon /></div>
+                    <span className={`text-sm font-semibold ${stat.isPositive ? 'text-green-600' : 'text-red-600'}`}>{stat.change}</span>
+                  </div>
+                  <p className="text-gray-500 text-sm mb-1">{stat.label}</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(stat.value)}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="card">
+            <h2 className="text-xl font-bold mb-6">Transactions récentes</h2>
+            <div className="space-y-4">
+              {transactions.map((t) => (
+                <div key={t.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">{t.icon}</div>
+                    <div>
+                      <p className="font-semibold">{t.name}</p>
+                      <p className="text-sm text-gray-500">{t.date}</p>
+                    </div>
+                  </div>
+                  <span className={`font-semibold ${t.amount > 0 ? 'text-green-600' : 'text-gray-900'}`}>{t.amount > 0 ? '+' : ''}{formatCurrency(t.amount)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card flex flex-col md:flex-row items-center gap-5">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6jc3wi50XmIkoAdSP1tnsApD6ogEbPrY8Nw&s"
+              alt="Gestionnaire de compte"
+              className="w-28 h-28 rounded-full object-cover border-4 border-yellow-100"
+            />
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900">Votre gestionnaire de compte</h2>
+              <p className="text-gray-700"><strong>Nom :</strong> Sophie Martin</p>
+              <p className="text-gray-700"><strong>Poste :</strong> Gestionnaire</p>
+              <p className="text-gray-700"><strong>Email :</strong> sophie.martin@banque.com</p>
+              <p className="text-gray-700"><strong>Téléphone :</strong> +212 6 68 04 56 00</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function CardsPage() {
+      const [cards] = useState([
+        { id: 1, number: '4532 1234 5678 9012', name: 'Christine Kadrell', expiry: '12/28', cvv: '769', type: 'debit', color: 'from-[#272E80] to-[#4C8CC7]', spent: 1234, limit: 5000 },
+        { id: 2, number: '5425 2334 6789 0123', name: 'Christine Kadrell', expiry: '08/27', cvv: '492', type: 'credit', color: 'from-black to-slate-700', spent: 3456, limit: 10000 },
+      ]);
+      const [showNumber, setShowNumber] = useState({});
+      const [showCvv, setShowCvv] = useState({});
+
+      return (
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Mes Cartes</h1>
+              <p className="text-gray-500 mt-1">Gérez vos cartes bancaires</p>
+            </div>
+            <button className="btn-primary w-fit"><Plus /> Nouvelle carte</button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {cards.map((card) => (
+              <div key={card.id} className={`bg-gradient-to-br ${card.color} rounded-3xl p-6 text-white relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="text-3xl">💳</div>
+                    <span className="text-sm font-semibold uppercase bg-white/20 px-3 py-1 rounded-full">{card.type}</span>
+                  </div>
+                  <p className="text-2xl font-bold tracking-wider font-mono mb-6">
+                    {showNumber[card.id] ? card.number : '**** **** **** ' + card.number.slice(-4)}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div><p className="text-sm text-white/80 mb-1">Titulaire</p><p className="font-semibold uppercase">{card.name}</p></div>
+                    <div><p className="text-sm text-white/80 mb-1">Expire</p><p className="font-semibold">{card.expiry}</p></div>
+                    <div>
+                      <p className="text-sm text-white/80 mb-1">CVV</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{showCvv[card.id] ? card.cvv : '***'}</p>
+                        <button onClick={() => setShowCvv({ ...showCvv, [card.id]: !showCvv[card.id] })} className="p-1 bg-white/20 rounded">👁️</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <div className="flex items-center justify-between text-sm mb-2"><span className="text-white/80">Limite</span><span className="font-semibold">{card.spent} / {card.limit} €</span></div>
+                    <div className="w-full bg-white/20 rounded-full h-2"><div className="bg-white rounded-full h-2" style={{ width: `${(card.spent / card.limit) * 100}%` }}></div></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function TransactionsPage() {
+      const [filter, setFilter] = useState('all');
+      const [search, setSearch] = useState('');
+
+      const transactions = [
+        { id: 1, name: 'Salaire Novembre', amount: 45000, type: 'revenu', date: '2024-12-01', category: 'Salaire', icon: '💰' },
+        { id: 2, name: 'Amazon FR', amount: -125.99, type: 'dépense', date: '2024-12-02', category: 'Shopping', icon: '🛒' },
+        { id: 3, name: 'Netflix', amount: -12.99, type: 'dépense', date: '2024-12-02', category: 'Abonnement', icon: '🎬' },
+        { id: 4, name: 'Resto Le Gourmet', amount: -85.5, type: 'dépense', date: '2024-12-01', category: 'Restauration', icon: '🍽️' },
+        { id: 5, name: 'Bonus', amount: 5000, type: 'revenu', date: '2024-12-01', category: 'Bonus', icon: '🎁' },
+        { id: 6, name: 'Uber', amount: -24.5, type: 'dépense', date: '2024-11-30', category: 'Transport', icon: '🚗' },
+      ];
+
+      const formatCurrency = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+      const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const filtered = transactions
+        .filter(t => filter === 'all' || t.type === filter)
+        .filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
+
+      return (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
+            <p className="text-gray-500 mt-1">Historique complet</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="card bg-gradient-to-br from-[#272E80] to-[#4C8CC7] text-white">
+              <p className="text-sm mb-2">Revenus</p>
+              <p className="text-3xl font-bold">{formatCurrency(filtered.filter(t => t.type === 'revenu').reduce((s, t) => s + t.amount, 0))}</p>
+            </div>
+            <div className="card bg-gradient-to-br from-black to-slate-700 text-white">
+              <p className="text-sm mb-2">Dépenses</p>
+              <p className="text-3xl font-bold">{formatCurrency(filtered.filter(t => t.type === 'dépense').reduce((s, t) => s + Math.abs(t.amount), 0))}</p>
+            </div>
+            <div className="card">
+              <p className="text-sm text-gray-500 mb-2">Balance</p>
+              <p className="text-3xl font-bold text-gray-900">{formatCurrency(filtered.reduce((s, t) => s + t.amount, 0))}</p>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Search /></div>
+                  <input
+                    type="text"
+                    placeholder="Rechercher..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD300] outline-none pl-10"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setFilter('all')} className={`px-4 py-3 rounded-xl font-semibold ${filter === 'all' ? 'bg-[#272E80] text-white' : 'bg-gray-100'}`}>Tout</button>
+                <button onClick={() => setFilter('revenu')} className={`px-4 py-3 rounded-xl font-semibold ${filter === 'revenu' ? 'bg-[#272E80] text-white' : 'bg-gray-100'}`}>Revenus</button>
+                <button onClick={() => setFilter('dépense')} className={`px-4 py-3 rounded-xl font-semibold ${filter === 'dépense' ? 'bg-[#272E80] text-white' : 'bg-gray-100'}`}>Dépenses</button>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {filtered.map((t) => (
+                <div key={t.id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-xl cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${t.type === 'revenu' ? 'bg-green-100' : 'bg-red-100'}`}>{t.icon}</div>
+                    <div>
+                      <p className="font-semibold">{t.name}</p>
+                      <p className="text-sm text-gray-500">{t.category} • {formatDate(t.date)}</p>
+                    </div>
+                  </div>
+                  <span className={`font-bold text-lg ${t.amount > 0 ? 'text-green-600' : 'text-gray-900'}`}>{t.amount > 0 ? '+' : ''}{formatCurrency(t.amount)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function StatsPage() {
+      const monthlyData = [
+        { month: 'Jan', dépenses: 3200, revenus: 4500 },
+        { month: 'Feb', dépenses: 2800, revenus: 4500 },
+        { month: 'Mar', dépenses: 3500, revenus: 5200 },
+        { month: 'Apr', dépenses: 3100, revenus: 4500 },
+        { month: 'May', dépenses: 2900, revenus: 4500 },
+        { month: 'Jun', dépenses: 3300, revenus: 4500 },
+      ];
+
+      return (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Statistiques</h1>
+            <p className="text-gray-500 mt-1">Analysez vos finances</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="card">
+              <p className="text-sm text-gray-500 mb-2">Revenus Annuels</p>
+              <p className="text-3xl font-bold text-gray-900">54,000 €</p>
+              <p className="text-sm text-green-600 mt-2">+12% vs 2023</p>
+            </div>
+            <div className="card">
+              <p className="text-sm text-gray-500 mb-2">Dépenses Annuelles</p>
+              <p className="text-3xl font-bold text-gray-900">36,550 €</p>
+              <p className="text-sm text-red-600 mt-2">-5% vs 2023</p>
+            </div>
+            <div className="card">
+              <p className="text-sm text-gray-500 mb-2">Épargne Totale</p>
+              <p className="text-3xl font-bold text-gray-900">17,450 €</p>
+              <p className="text-sm text-[#272E80] mt-2">32% du revenu</p>
+            </div>
+          </div>
+
+          <div className="card">
+            <h2 className="text-xl font-bold mb-6">Revenus vs Dépenses - 2024</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Mois</th>
+                    <th className="text-left py-3 px-4">Revenus</th>
+                    <th className="text-left py-3 px-4">Dépenses</th>
+                    <th className="text-left py-3 px-4">Solde</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyData.map((d, i) => (
+                    <tr key={i} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4 font-semibold">{d.month}</td>
+                      <td className="py-3 px-4 text-green-600">+{d.revenus}€</td>
+                      <td className="py-3 px-4 text-red-600">{d.dépenses}€</td>
+                      <td className="py-3 px-4 font-semibold">{d.revenus - d.dépenses}€</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [loggedIn, setLoggedIn] = useState(false);
+      const [sidebarOpen, setSidebarOpen] = useState(false);
+      const [activePage, setActivePage] = useState('home');
+
+      if (!loggedIn) {
+        return <Login onLogin={() => setLoggedIn(true)} />;
+      }
+
+      return (
+        <div className="min-h-screen bg-gray-50 flex">
+          <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} activePage={activePage} setActivePage={setActivePage} />
+          <div className="flex-1 flex flex-col">
+            <Header onMenuClick={() => setSidebarOpen(true)} />
+            <main className="flex-1 p-4 lg:p-6 overflow-auto">
+              {activePage === 'home' && <Dashboard />}
+              {activePage === 'cards' && <CardsPage />}
+              {activePage === 'transactions' && <TransactionsPage />}
+              {activePage === 'stats' && <StatsPage />}
+              {activePage === 'transfer' && <TransferPage onBack={() => setActivePage('home')} />}
+            </main>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
